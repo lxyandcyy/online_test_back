@@ -10,6 +10,20 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+//解决body-parser限制body长度问题
+app.use(
+  bodyParser.json({
+    limit: "10000kb"
+  })
+);
+app.use(
+  bodyParser.urlencoded({
+    limit: "10000kb",
+    parameterLimit: 10000000000000000,
+    extended: true
+  })
+);
+
 app.use("/user", user);
 
 app.listen(6001, function() {
