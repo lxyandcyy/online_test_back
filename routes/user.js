@@ -1,6 +1,6 @@
 var express = require("express");
 let router = express.Router();
-var Module = require("../db/module");
+var Module = require("../entity/module");
 let axios = require("axios");
 let qs = require("qs");
 
@@ -9,7 +9,6 @@ let qs = require("qs");
 */
 router.post("/regInfo", function(req, res) {
   const req_body = req.body;
-  console.log(req_body);
 
   //   查询是否用户已注册
   const isReg = async function() {
@@ -26,6 +25,7 @@ router.post("/regInfo", function(req, res) {
     let isreg = await isReg(); //判断用户是否重复注册
     if (isreg.length == 0) {
       //数据库没有此用户，能注册
+      console.log(isreg);
       let UserInfo = await Module.UserInfo.create({
         user_id: req_body.user_id,
         password: req_body.password
@@ -40,6 +40,46 @@ router.post("/regInfo", function(req, res) {
       res.json({
         state: 400,
         msg: "用户已被注册"
+      });
+    }
+  })();
+});
+
+/*
+路径：/user/detectInfo
+*/
+router.post("/detectInfo", function(req, res) {
+  const req_body = req.body;
+
+  //查询是否有该用户
+  const hasUser = async function() {
+    let UserInfo = await Module.UserInfo.findAll({
+      where: {
+        user_id: req_body.user_id
+      }
+    });
+    return UserInfo;
+  };
+
+  //验证账户、密码
+  (async () => {
+    let hasuser = await hasUser(); //判断用户是否存在
+    const user = hasuser[0];
+    //数据库有此用户，且密码正确
+    if (hasuser.length !== 0 && user.password === req_body.password) {
+      res.json({
+        state: 200,
+        msg: "账户验证成功！"
+      });
+    } else if (hasuser.length === 0) {
+      res.json({
+        state: 400,
+        msg: "没有此用户！"
+      });
+    } else if (hasuser.length !== 0 && hasuser.password !== req_body.password) {
+      res.json({
+        state: 401,
+        msg: "密码错误！"
       });
     }
   })();
@@ -69,6 +109,23 @@ router.post("/Login", function(req, res) {
   axios
     .post(
       "https://aip.baidubce.com/rest/2.0/face/v3/search",
+      qs.stringify(req.body)
+    )
+    .then(response => {
+      res.json(response.data);
+    })
+    .catch(error => {
+      console.log(error);
+    });
+});
+
+/*
+路径：/user/changeFace
+*/
+router.post("/changeFace", function(req, res) {
+  axios
+    .post(
+      "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/update",
       qs.stringify(req.body)
     )
     .then(response => {
