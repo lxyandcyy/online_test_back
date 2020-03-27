@@ -2,6 +2,7 @@ var express = require("express");
 let router = express.Router();
 var Module = require("../db/module");
 let axios = require("axios");
+let qs = require("qs");
 
 /*
 路径：/user/regInfo
@@ -48,20 +49,34 @@ router.post("/regInfo", function(req, res) {
 路径：/user/regFace
 */
 router.post("/regFace", function(req, res) {
-  console.log(req.body);
   axios
     .post(
       "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add",
-      req.body
+      qs.stringify(req.body)
     )
     .then(response => {
-      console.log("mmmmmmmm");
-      console.log(response.data);
       res.json(response.data);
     })
     .catch(error => {
-      console.log("asdfasdfasdfasdfasdfasdfsa");
       console.log(error);
     });
 });
+
+/*
+路径：/user/Login
+*/
+router.post("/Login", function(req, res) {
+  axios
+    .post(
+      "https://aip.baidubce.com/rest/2.0/face/v3/search",
+      qs.stringify(req.body)
+    )
+    .then(response => {
+      res.json(response.data);
+    })
+    .catch(error => {
+      console.log(error);
+    });
+});
+
 module.exports = router;

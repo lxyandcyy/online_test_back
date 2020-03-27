@@ -26,6 +26,8 @@ app.use(
 
 app.use("/user", user);
 
-app.listen(6001, function() {
+let server = app.listen(6001, function() {
   console.log("服务器打开了--> http://localhost:6001/");
 });
+
+server.setTimeout(0);
