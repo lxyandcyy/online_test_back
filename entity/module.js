@@ -13,8 +13,8 @@ var sequelize = new Sequelize(
     pool: {
       max: 5,
       min: 0,
-      idle: 30000
-    }
+      idle: 30000,
+    },
   }
 );
 
@@ -25,13 +25,15 @@ const UserInfo = sequelize.define(
   {
     user_id: {
       type: Sequelize.STRING(20),
-      primaryKey: true
+      primaryKey: true,
     },
-    password: Sequelize.STRING(20)
+    password: Sequelize.STRING(20),
+    user_type: Sequelize.STRING(20),
+    reg_time: Sequelize.STRING(20),
   },
   {
     timestamps: false,
-    freezeTableName: true
+    freezeTableName: true,
   }
 );
 
