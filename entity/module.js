@@ -37,4 +37,28 @@ const UserInfo = sequelize.define(
   }
 );
 
-module.exports = { UserInfo };
+// 定义模型 T_Question
+// 对应表： t_question
+const T_Question = sequelize.define(
+  "t_question",
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+    },
+    subject_id: Sequelize.INTEGER,
+    difficult: Sequelize.INTEGER,
+    correct: Sequelize.STRING(20),
+    create_user: Sequelize.STRING(20),
+    create_time: Sequelize.STRING(20),
+    topic: Sequelize.STRING(20),
+    parse: Sequelize.STRING(20),
+    options: Sequelize.STRING(20),
+  },
+  {
+    timestamps: false,
+    freezeTableName: true,
+  }
+);
+
+module.exports = { UserInfo, T_Question };

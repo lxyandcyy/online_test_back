@@ -5,7 +5,7 @@ let axios = require("axios");
 let qs = require("qs");
 
 /*
-路径：/user/getToken
+路径：/user/getToken  
 */
 router.post("/getToken", function (req, res) {
   axios
@@ -19,7 +19,7 @@ router.post("/getToken", function (req, res) {
 });
 
 /*
-路径：/user/regInfo
+路径：/user/regInfo 用户基本信息注册
 */
 router.post("/regInfo", function (req, res) {
   const req_body = req.body;
@@ -43,17 +43,12 @@ router.post("/regInfo", function (req, res) {
       console.log("数据库中于此用户名相同的有：", isreg);
       //注册时间格式处理
       let time = new Date(req_body.reg_time);
-      time = `${time.getFullYear()}-${
+      req_body.reg_time = `${time.getFullYear()}-${
         time.getMonth() + 1
       }-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
 
-      let UserInfo = await Module.UserInfo.create({
-        user_id: req_body.user_id,
-        password: req_body.password,
-        user_type: req_body.user_type,
-        reg_address: req_body.reg_address,
-        reg_time: time,
-      });
+      let UserInfo = await Module.UserInfo.create(req_body); //创建新用户
+
       console.log("注册新用户: " + JSON.stringify(UserInfo));
       res.json({
         state: 200,
@@ -70,7 +65,7 @@ router.post("/regInfo", function (req, res) {
 });
 
 /*
-路径：/user/detectInfo
+路径：/user/detectInfo  验证用户基本信息，如账号密码
 */
 router.post("/detectInfo", function (req, res) {
   const req_body = req.body;
@@ -110,7 +105,7 @@ router.post("/detectInfo", function (req, res) {
 });
 
 /*
-路径：/user/regFace
+路径：/user/regFace 用户人脸绑定
 */
 router.post("/regFace", function (req, res) {
   axios
@@ -127,7 +122,7 @@ router.post("/regFace", function (req, res) {
 });
 
 /*
-路径：/user/Login
+路径：/user/Login 用户通过人脸base64照片登录
 */
 router.post("/Login", function (req, res) {
   axios
@@ -144,7 +139,7 @@ router.post("/Login", function (req, res) {
 });
 
 /*
-路径：/user/changeFace
+路径：/user/changeFace  重新绑定人脸
 */
 router.post("/changeFace", function (req, res) {
   axios
@@ -158,6 +153,21 @@ router.post("/changeFace", function (req, res) {
     .catch((error) => {
       console.log(error);
     });
+});
+
+/*
+路径：/user/allUserInfo  所有用户基本信息获取
+*/
+router.get("/allUserInfo", function (req, res) {
+  (async () => {
+    let UserInfo = await Module.UserInfo.findAll();
+    let dataValues = [];
+
+    for (let p of UserInfo) {
+      dataValues.push(JSON.parse(JSON.stringify(p)));
+    }
+    res.json(dataValues);
+  })();
 });
 
 module.exports = router;
