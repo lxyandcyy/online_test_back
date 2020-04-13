@@ -18,8 +18,6 @@ var sequelize = new Sequelize(
   }
 );
 
-// 定义模型 UserInfo，告诉Sequelize如何映射数据库表
-// 对应表： user_info
 const UserInfo = sequelize.define(
   "user_info",
   {
@@ -61,4 +59,64 @@ const T_Question = sequelize.define(
   }
 );
 
-module.exports = { UserInfo, T_Question };
+// 定义模型 T_Exam_Paper
+// 对应表： t_exam_paper
+const T_Exam_Paper = sequelize.define(
+  "t_exam_paper",
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+    },
+    name: Sequelize.STRING(20),
+    subject_id: Sequelize.INTEGER,
+    grade_level: Sequelize.INTEGER,
+    score: Sequelize.INTEGER,
+    question_count: Sequelize.INTEGER,
+    countdown: Sequelize.INTEGER,
+    frame_text_content_id: Sequelize.INTEGER,
+    create_user: Sequelize.STRING(20),
+    create_time: Sequelize.STRING(20),
+    deleted: Sequelize.INTEGER,
+    task_exam_id: Sequelize.INTEGER,
+  },
+  {
+    timestamps: false,
+    freezeTableName: true,
+  }
+);
+
+// 定义模型 T_Exam_Paper_Question_Custom_Answer   试卷与题目关系表
+// 对应表： t_exam_paper_question_custom_answer
+const T_Exam_Paper_Question_Custom_Answer = sequelize.define(
+  "t_exam_paper_question_custom_answer",
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+    },
+    question_id: Sequelize.INTEGER,
+    exam_paper_id: Sequelize.INTEGER,
+    exam_paper_answer_id: Sequelize.INTEGER,
+    question_type: Sequelize.INTEGER,
+    subject_id: Sequelize.INTEGER,
+    customer_score: Sequelize.INTEGER,
+    question_score: Sequelize.INTEGER,
+    question_text_content_id: Sequelize.INTEGER,
+    do_right: Sequelize.STRING(20),
+    do_user: Sequelize.STRING(20),
+    do_time: Sequelize.STRING(20),
+    item_order: Sequelize.INTEGER,
+  },
+  {
+    timestamps: false,
+    freezeTableName: true,
+  }
+);
+
+module.exports = {
+  UserInfo,
+  T_Question,
+  T_Exam_Paper,
+  T_Exam_Paper_Question_Custom_Answer,
+};
