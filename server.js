@@ -1,9 +1,12 @@
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
+
 let user = require("./routes/user");
 let question = require("./routes/question");
 let paper = require("./routes/paper");
+let verifyToken = require("./routes/verifyToken");
+
 let cors = require("cors");
 
 // 解决cors跨域问题
@@ -29,6 +32,7 @@ app.use(
 app.use("/user", user);
 app.use("/question", question);
 app.use("/paper", paper);
+app.use("/verify-token", verifyToken);
 
 let server = app.listen(6001, function () {
   console.log("服务器打开了--> http://localhost:6001/");

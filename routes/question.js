@@ -54,10 +54,11 @@ router.post("/add-que", function (req, res) {
   }-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
 
   //   生成随机id
-  req_body.id = Math.random() * 1000;
+  // req_body.id = Math.random() * 1000;
   //   options格式处理
   req_body.options = JSON.stringify(req_body.options);
 
+  console.log("数据处理后的req_body:", req_body);
   (async () => {
     let T_Question = await Module.T_Question.create(req_body); //新增题目
 

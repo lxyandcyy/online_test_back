@@ -3,6 +3,7 @@ let router = express.Router();
 var Module = require("../entity/module");
 let axios = require("axios");
 let qs = require("qs");
+let jwt = require("jsonwebtoken");
 
 /*
 路径：/user/getToken  
@@ -125,12 +126,21 @@ router.post("/regFace", function (req, res) {
 路径：/user/Login 用户通过人脸base64照片登录
 */
 router.post("/Login", function (req, res) {
+  // 用jwt生成用户身份验证的token
+  let log_token = jwt.sign(
+    { user_id: req.body.user_id, exp: Math.floor(Date.now() / 1000) + 60 * 10 },
+    "secret"
+  );
+
+  console.log("jwt生成的token:", log_token);
+
   axios
     .post(
       "https://aip.baidubce.com/rest/2.0/face/v3/search",
       qs.stringify(req.body)
     )
     .then((response) => {
+      response.data["log_token"] = log_token;
       res.json(response.data);
     })
     .catch((error) => {
@@ -167,6 +177,42 @@ router.get("/allUserInfo", function (req, res) {
       dataValues.push(JSON.parse(JSON.stringify(p)));
     }
     res.json(dataValues);
+  })();
+});
+
+/*
+路径：/user/sel-user  单个用户基本信息获取
+*/
+router.get("/sel-user", function (req, res) {
+  (async () => {
+    let UserInfo = await Module.UserInfo.findAll({
+      where: {
+        user_id: req.query.user_id,
+      },
+    });
+    let dataValues = [];
+
+    dataValues.push(UserInfo[0]);
+    res.json(dataValues[0]);
+  })();
+});
+
+/*
+路径：/user/update-user  单个用户基本信息获取
+*/
+router.post("/update-user", function (req, res) {
+  (async () => {
+    let UserInfo = await Module.UserInfo.update(req.body, {
+      where: {
+        user_id: req.body.user_id,
+      },
+    });
+    console.log("更新用户信息: " + JSON.stringify(UserInfo));
+
+    res.json({
+      state: 200,
+      msg: "更新用户信息成功",
+    });
   })();
 });
 
