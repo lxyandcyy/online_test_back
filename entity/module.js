@@ -71,7 +71,7 @@ const T_Exam_Paper = sequelize.define(
     name: Sequelize.STRING(20),
     subject_id: Sequelize.INTEGER,
     grade_level: Sequelize.INTEGER,
-    score: Sequelize.INTEGER,
+    paper_score: Sequelize.INTEGER,
     question_count: Sequelize.INTEGER,
     countdown: Sequelize.INTEGER,
     frame_text_content_id: Sequelize.INTEGER,
@@ -79,6 +79,8 @@ const T_Exam_Paper = sequelize.define(
     create_time: Sequelize.STRING(20),
     deleted: Sequelize.INTEGER,
     task_exam_id: Sequelize.INTEGER,
+    end_time: Sequelize.STRING(20),
+    start_time: Sequelize.STRING(20),
   },
   {
     timestamps: false,

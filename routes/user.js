@@ -128,7 +128,7 @@ router.post("/regFace", function (req, res) {
 router.post("/Login", function (req, res) {
   // 用jwt生成用户身份验证的token
   let log_token = jwt.sign(
-    { user_id: req.body.user_id, exp: Math.floor(Date.now() / 1000) + 60 * 10 },
+    { user_id: req.body.user_id, exp: Math.floor(Date.now() / 1000) + 60 * 60 },
     "secret"
   );
 
