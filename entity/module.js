@@ -88,6 +88,46 @@ const T_Exam_Paper = sequelize.define(
   }
 );
 
+// 定义模型 Practic_Paper 智能训练试卷表
+// 对应表： Practic_Paper
+const Practic_Paper = sequelize.define(
+  "practice_paper",
+  {
+    practice_paper_id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    practice_paper_name: Sequelize.STRING(20),
+    subjects_id: Sequelize.STRING(20),
+    question_count: Sequelize.INTEGER,
+    difficult: Sequelize.INTEGER,
+    create_time: Sequelize.STRING(20),
+  },
+  {
+    timestamps: false,
+    freezeTableName: true,
+  }
+);
+
+// 定义模型 PracticePaper_Question  训练试卷与题目关系表
+// 对应表： PracticePaper_Question
+const PracticePaper_Question = sequelize.define(
+  "practicePaper_question",
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+    },
+    question_id: Sequelize.INTEGER,
+    practice_paper_id: Sequelize.INTEGER,
+  },
+  {
+    timestamps: false,
+    freezeTableName: true,
+  }
+);
+
 // 定义模型 T_Exam_Paper_Question_Custom_Answer   试卷与题目关系表
 // 对应表： t_exam_paper_question_custom_answer
 const T_Exam_Paper_Question_Custom_Answer = sequelize.define(
@@ -120,5 +160,7 @@ module.exports = {
   UserInfo,
   T_Question,
   T_Exam_Paper,
+  Practic_Paper,
+  PracticePaper_Question,
   T_Exam_Paper_Question_Custom_Answer,
 };

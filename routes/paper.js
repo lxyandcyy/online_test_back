@@ -206,4 +206,98 @@ router.post("/del-paper", function (req, res) {
   })();
 });
 
+/*
+路径：/paper/submit-exam  提交答题内容
+*/
+router.post("/submit-exam", function (req, res) {
+  let req_body = req.body;
+  console.log("做题内容数据：", req_body);
+
+  //做题时间 格式处理
+  let time = new Date();
+  req_body.user.do_time = `${time.getFullYear()}-${
+    time.getMonth() + 1
+  }-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
+
+  // {
+  //   formQueItems: [
+  //     {
+  //       id: 2,
+  //       subject_id: 1,
+  //       difficult: 5,
+  //       correct: 'C',
+  //       create_user: '',
+  //       create_time: '2020-4-17 11:43:1',
+  //       topic: '阿桑的歌',
+  //       parse: '52345',
+  //       options: [Array],
+  //       current_option: 3
+  //     },
+  //     {
+  //       id: 3,
+  //       subject_id: 1,
+  //       difficult: 3,
+  //       correct: 'B',
+  //       create_user: 'lxyoryxl',
+  //       create_time: '2020-4-23 14:7:3',
+  //       topic: 'asdgag',
+  //       parse: 'fdghdfgh',
+  //       options: [Array],
+  //       current_option: 1
+  //     }
+  //   ],
+  //   paper: {
+  //     id: 774,
+  //     name: '见刚好是的',
+  //     subject_id: 1,
+  //     grade_level: null,
+  //     paper_score: null,
+  //     question_count: null,
+  //     countdown: 8,
+  //     frame_text_content_id: null,
+  //     create_user: null,
+  //     create_time: '2020-4-23 14:7:28',
+  //     deleted: null,
+  //     task_exam_id: null,
+  //     end_time: null,
+  //     start_time: null
+  //   }
+  // }
+
+  // 计算得分
+  req_body.formQueItems.forEach((item) => {
+    let map = []; //一道题的选项映射
+    for (let i = 0; i < item.options.length; i++) {
+      map.push({ i: item.options[i].prefix });
+    }
+    // 比对答案
+    if (item.corrent === map[item.current_option]) {
+      item.do_right = true; //用户本题正确
+      item.customer_score = 10; //item.question_score;//用户本题得分。。。。待修改
+    } else {
+      item.do_right = false; //用户本题错误
+      item.customer_score = 0;
+    }
+
+    (async () => {
+      // 新增考试记录
+      let T_Exam_Paper_Question_Custom_Answer = await Module.T_Exam_Paper_Question_Custom_Answer.create(
+        {
+          question_id: item.id,
+          exam_paper_id: req_body.paper.id,
+          customer_score: item.customer_score,
+          do_right: item.do_right,
+          do_user: req_body.user.user_id,
+          do_time: req_body.user.do_time,
+        }
+      );
+    })();
+
+    res.json({
+      state: 200,
+      msg: "计算分数成功",
+    });
+  });
+});
+
 module.exports = router;

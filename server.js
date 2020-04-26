@@ -6,6 +6,7 @@ let user = require("./routes/user");
 let question = require("./routes/question");
 let paper = require("./routes/paper");
 let verifyToken = require("./routes/verifyToken");
+let practicePaper = require("./routes/practicePaper");
 
 let cors = require("cors");
 
@@ -29,10 +30,12 @@ app.use(
   })
 );
 
+// 所有接口设置
 app.use("/user", user);
 app.use("/question", question);
 app.use("/paper", paper);
 app.use("/verify-token", verifyToken);
+app.use("/practice-paper", practicePaper);
 
 let server = app.listen(6001, function () {
   console.log("服务器打开了--> http://localhost:6001/");
