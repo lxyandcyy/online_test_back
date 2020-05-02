@@ -1,13 +1,13 @@
 var express = require("express");
 let router = express.Router();
-var Module = require("../models/module");
+var Module = require("../models/Models");
 
 /*
 路径：/practice-paper/list  获取试卷
 */
 router.get("/list", function (req, res) {
     (async () => {
-        let Practic_Paper = await Module.Practic_Paper.findAll();
+        let Practic_Paper = await Module.PracticePaper.findAll();
         let dataValues = [];
 
         for (let p of Practic_Paper) {
@@ -28,7 +28,7 @@ router.get("/sel", function (req, res) {
     console.log("当前选择的单个试卷ID为：", Id);
 
     (async () => {
-        let single_paper = await Module.Practic_Paper.findAll({
+        let single_paper = await Module.PracticePaper.findAll({
             where: {
                 id: Id,
             },
@@ -43,7 +43,7 @@ router.get("/sel", function (req, res) {
         );
 
         for (let q of single_paper_question_custom_answer) {
-            await Module.T_Question.findAll({
+            await Module.Question.findAll({
                 where: {
                     id: q.questionId,
                 },
@@ -75,8 +75,8 @@ router.post("/add", function (req, res) {
 
     (async () => {
         // 新增试卷
-        let Practic_Paper = await Module.Practic_Paper.create({
-            practicePaperName: "智能试卷",
+        let Practic_Paper = await Module.PracticePaper.create({
+            name: "智能试卷",
             subjectsId: JSON.stringify(req_body.subjectsId),
             questionCount: req_body.questionCount,
             difficult: req_body.difficult,
@@ -84,14 +84,14 @@ router.post("/add", function (req, res) {
         });
 
         // 三个条件来随机选取题目，并添加到试卷
-        const questionItems = await Module.T_Question.findAll({
+        const questionItems = await Module.Question.findAll({
             where: {
                 difficult: req_body.difficult,
-                subject_id: 1,
+                subjectId: 1,
             },
         });
 
-        req_body.practicePaperId = Practic_Paper.dataValues.practicePaperId;
+        req_body.id = Practic_Paper.dataValues.id;
         let real_que_count =
             req_body.questionCount <= questionItems.length
                 ? req_body.questionCount
@@ -100,7 +100,7 @@ router.post("/add", function (req, res) {
         for (let i = 0; i < real_que_count; i++) {
             // 新增试卷与题目的关联关系;
             await Module.PracticePaper_Question.create({
-                practicePaperId: req_body.practicePaperId, //试卷id
+                id: req_body.id, //试卷id
                 questionId: questionItems[i].dataValues.id,
             });
         }
@@ -132,7 +132,7 @@ router.post("/edit", function (req, res) {
     );
 
     (async () => {
-        let single_paper = await Module.Practic_Paper.update(
+        let single_paper = await Module.PracticePaper.update(
             {
                 subjectId: req_body.subjectId,
                 name: req_body.name,
@@ -178,11 +178,11 @@ router.post("/edit", function (req, res) {
 路径： practice-paper/del  删除智能练习试卷
 */
 router.post("/del", function (req, res) {
-    let Id = req.body.practicePaperId;
+    let Id = req.body.id;
     console.log("删除试卷所提交的id：", Id);
 
     (async () => {
-        let single_paper = await Module.Practic_Paper.destroy({
+        let single_paper = await Module.PracticePaper.destroy({
             where: {
                 practice_paper_id: Id,
             },

@@ -1,24 +1,31 @@
-const { Sequelize, Model, DataTypes } = require("sequelize");
+const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../config/DBconfig");
 
+// TODO: 完成表设计
 class PracticePaper extends Model {}
 
 PracticePaper.init(
     {
-        practicePaperId: {
+        id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
         },
-        practicePaperName: DataTypes.STRING(20),
-        subjectsId: DataTypes.STRING(20),
+        name: { type: DataTypes.STRING(20), defaultValue: "智能试卷" },
+        /** 外键 */
+        // subjectsId: DataTypes.STRING(20),
         questionCount: DataTypes.INTEGER,
         difficult: DataTypes.INTEGER,
-        createTime: DataTypes.STRING(20),
+        createTime: { defaultValue: DataTypes.NOW, type: DataTypes.DATE },
     },
     {
         sequelize,
         tableName: "practice_paper",
+        getterMethods: {
+            paperName() {
+                return this.name + this.id;
+            },
+        },
     }
 );
 

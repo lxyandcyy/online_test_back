@@ -1,6 +1,6 @@
 var express = require("express");
 let router = express.Router();
-var Module = require("../models/module");
+var Module = require("../models/Models");
 let axios = require("axios");
 let qs = require("qs");
 
@@ -9,13 +9,8 @@ let qs = require("qs");
 */
 router.get("/list", function (req, res) {
     (async () => {
-        let T_Exam_Paper = await Module.T_Exam_Paper.findAll();
-        let dataValues = [];
-
-        for (let p of T_Exam_Paper) {
-            dataValues.push(p);
-        }
-        res.json(dataValues);
+        let T_Exam_Paper = await Module.ExamPaper.findAll();
+        res.json(T_Exam_Paper.get({ plain: true }));
     })();
 });
 
@@ -30,13 +25,13 @@ router.get("/sel-paper", function (req, res) {
     console.log("当前选择的单个试卷ID为：", Id);
 
     (async () => {
-        let single_paper = await Module.T_Exam_Paper.findAll({
+        let single_paper = await Module.ExamPaper.findAll({
             where: {
                 id: Id,
             },
         });
 
-        let single_paper_question_custom_answer = await Module.T_Exam_Paper_Question_Custom_Answer.findAll(
+        let single_paper_question_custom_answer = await Module.User_ExamPaper_Question.findAll(
             {
                 where: {
                     examPaperId: Id,
@@ -45,7 +40,7 @@ router.get("/sel-paper", function (req, res) {
         );
 
         for (let q of single_paper_question_custom_answer) {
-            await Module.T_Question.findAll({
+            await Module.Question.findAll({
                 where: {
                     id: q.questionId,
                 },
@@ -82,7 +77,7 @@ router.post("/add-paper", function (req, res) {
 
     (async () => {
         // 新增试卷
-        let T_Exam_Paper = await Module.T_Exam_Paper.create({
+        let T_Exam_Paper = await Module.ExamPaper.create({
             id: t_exam_paper_id,
             name: req_body.name,
             subjectId: req_body.subjectId,
@@ -91,7 +86,7 @@ router.post("/add-paper", function (req, res) {
         });
 
         await req_body.questionItems.forEach((q) => {
-            let T_Exam_Paper_Question_Custom_Answer = Module.T_Exam_Paper_Question_Custom_Answer.create(
+            let T_Exam_Paper_Question_Custom_Answer = Module.User_ExamPaper_Question.create(
                 {
                     id: Math.random() * 1000,
                     questionId: q.id,
@@ -133,7 +128,7 @@ router.post("/edit-paper", function (req, res) {
     );
 
     (async () => {
-        let single_paper = await Module.T_Exam_Paper.update(
+        let single_paper = await Module.ExamPaper.update(
             {
                 subjectId: req_body.subjectId,
                 name: req_body.name,
@@ -148,17 +143,15 @@ router.post("/edit-paper", function (req, res) {
         ); //更新t_exam_paper表
 
         // 删除试卷对应的所有题目
-        let paper_que_cus_ans = await Module.T_Exam_Paper_Question_Custom_Answer.destroy(
-            {
-                where: {
-                    exam_paper_id: req_body.id,
-                },
-            }
-        );
+        let paper_que_cus_ans = await Module.User_ExamPaper_Question.destroy({
+            where: {
+                exam_paper_id: req_body.id,
+            },
+        });
 
         // 添加试卷对应的题目
         for (let p = 0; p < req_body.questionItems.length; p++) {
-            let paper_que_cus_ans = await Module.T_Exam_Paper_Question_Custom_Answer.create(
+            let paper_que_cus_ans = await Module.User_ExamPaper_Question.create(
                 {
                     examPaperId: req_body.id,
                     questionId: req_body.questionItems[p].id,
@@ -183,19 +176,17 @@ router.post("/del-paper", function (req, res) {
     console.log("删除试卷所提交的id：", Id);
 
     (async () => {
-        let single_paper = await Module.T_Exam_Paper.destroy({
+        let single_paper = await Module.ExamPaper.destroy({
             where: {
                 id: Id,
             },
         }); //删除题目
 
-        let paper_que_cus_ans = await Module.T_Exam_Paper_Question_Custom_Answer.destroy(
-            {
-                where: {
-                    exam_paper_id: Id,
-                },
-            }
-        ); //
+        let paper_que_cus_ans = await Module.User_ExamPaper_Question.destroy({
+            where: {
+                exam_paper_id: Id,
+            },
+        }); //
         console.log("删除题目: " + JSON.stringify(single_paper));
         console.log("删除题目: " + JSON.stringify(paper_que_cus_ans));
 
@@ -264,6 +255,7 @@ router.post("/submit-exam", function (req, res) {
     //   }
     // }
 
+    // TODO: 修复逻辑
     // 计算得分
     req_body.formQueItems.forEach((item) => {
         let map = []; //一道题的选项映射
@@ -273,22 +265,22 @@ router.post("/submit-exam", function (req, res) {
         // 比对答案
         if (item.corrent === map[item.current_option]) {
             item.doRight = true; //用户本题正确
-            item.customerScore = 10; //item.question_score;//用户本题得分。。。。待修改
+            item.score = 10; //item.question_score;//用户本题得分。。。。待修改
         } else {
             item.doRight = false; //用户本题错误
-            item.customerScore = 0;
+            item.score = 0;
         }
 
         (async () => {
             // 新增考试记录
-            let T_Exam_Paper_Question_Custom_Answer = await Module.T_Exam_Paper_Question_Custom_Answer.create(
+            let T_Exam_Paper_Question_Custom_Answer = await Module.User_ExamPaper_Question.create(
                 {
                     questionId: item.id,
                     examPaperId: req_body.paper.id,
-                    customerScore: item.customerScore,
+                    score: item.score,
                     doRight: item.doRight,
                     doUser: req_body.user.username,
-                    doTime: req_body.user.doTime,
+                    // doTime: req_body.user.doTime,
                 }
             );
         })();

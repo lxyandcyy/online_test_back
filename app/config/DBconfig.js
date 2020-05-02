@@ -2,7 +2,7 @@
  * 以下部分为数据库配置， 连接数据库
  */
 
-const Sequelize = require("sequelize");
+const { Sequelize, DataTypes } = require("sequelize");
 
 var DBconfig = {
     database: "test_online",

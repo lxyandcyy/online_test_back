@@ -1,6 +1,6 @@
 var express = require("express");
 let router = express.Router();
-var Module = require("../models/module");
+var Module = require("../models/Models");
 let axios = require("axios");
 let qs = require("qs");
 let jwt = require("jsonwebtoken");
@@ -31,9 +31,9 @@ router.post("/regInfo", function (req, res) {
 
     //   查询是否用户已注册
     const isReg = async function () {
-        let UserInfo = await Module.UserInfo.findAll({
+        let UserInfo = await Module.User.findAll({
             where: {
-                user_id: req_body.username,
+                userId: req_body.username,
             },
         });
         return UserInfo;
@@ -51,7 +51,7 @@ router.post("/regInfo", function (req, res) {
                 time.getMonth() + 1
             }-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
 
-            let UserInfo = await Module.UserInfo.create(req_body); //创建新用户
+            let UserInfo = await Module.User.create(req_body); //创建新用户
 
             console.log("注册新用户: " + JSON.stringify(UserInfo));
             res.json({
@@ -76,9 +76,9 @@ router.post("/detectInfo", function (req, res) {
 
     //查询是否有该用户
     const hasUser = async function () {
-        let UserInfo = await Module.UserInfo.findAll({
+        let UserInfo = await Module.User.findAll({
             where: {
-                user_id: req_body.username,
+                userId: req_body.username,
             },
         });
         return UserInfo;
@@ -179,7 +179,7 @@ router.post("/changeFace", function (req, res) {
 */
 router.get("/allUserInfo", function (req, res) {
     (async () => {
-        let UserInfo = await Module.UserInfo.findAll();
+        let UserInfo = await Module.User.findAll();
         let dataValues = [];
 
         for (let p of UserInfo) {
@@ -194,9 +194,9 @@ router.get("/allUserInfo", function (req, res) {
 */
 router.get("/sel-user", function (req, res) {
     (async () => {
-        let UserInfo = await Module.UserInfo.findAll({
+        let UserInfo = await Module.User.findAll({
             where: {
-                user_id: req.query.username,
+                userId: req.query.username,
             },
         });
         let dataValues = [];
@@ -211,7 +211,7 @@ router.get("/sel-user", function (req, res) {
 */
 router.post("/update-user", function (req, res) {
     (async () => {
-        let UserInfo = await Module.UserInfo.update(req.body, {
+        let UserInfo = await Module.User.update(req.body, {
             where: {
                 username: req.body.username,
             },

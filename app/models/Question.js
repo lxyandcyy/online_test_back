@@ -13,18 +13,18 @@ Question.init(
             primaryKey: true,
             autoIncrement: true,
         },
-        subjectId: DataTypes.INTEGER,
-        difficult: DataTypes.INTEGER,
-        correct: DataTypes.STRING(20),
-        /** 创建的用户 */
-        createUser: DataTypes.STRING(20),
+        /** 外键 */
+        // subjectId: {
+        //   type: DataTypes.BIGINT
+        // },
+        /** 创建的用户外键 */
+        // createUser: DataTypes.BIGINT,
+        difficult: DataTypes.ENUM("1", "2", "3", "4", "5"),
         createTime: DataTypes.DATE,
         /** 题干 */
         topic: DataTypes.STRING(20),
         /** 解析 */
         analysis: DataTypes.STRING(20),
-        /** 选项 */
-        options: DataTypes.STRING(20),
     },
     {
         sequelize,

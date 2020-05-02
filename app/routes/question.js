@@ -1,6 +1,6 @@
 var express = require("express");
 let router = express.Router();
-var Module = require("../models/module");
+var Module = require("../models/Models");
 let axios = require("axios");
 let qs = require("qs");
 
@@ -9,7 +9,7 @@ let qs = require("qs");
 */
 router.get("/list", function (req, res) {
     (async () => {
-        let T_Question = await Module.T_Question.findAll();
+        let T_Question = await Module.Question.findAll();
         let dataValues = [];
 
         for (let p of T_Question) {
@@ -27,7 +27,7 @@ router.get("/sel-que", function (req, res) {
     console.log(req_query);
 
     (async () => {
-        let T_Question = await Module.T_Question.findAll({
+        let T_Question = await Module.Question.findAll({
             where: {
                 id: req_query.id,
             },
@@ -60,7 +60,7 @@ router.post("/add-que", function (req, res) {
 
     console.log("数据处理后的req_body:", req_body);
     (async () => {
-        let T_Question = await Module.T_Question.create(req_body); //新增题目
+        let T_Question = await Module.Question.create(req_body); //新增题目
 
         console.log("新增题目: " + JSON.stringify(T_Question));
         res.json({
@@ -87,7 +87,7 @@ router.post("/edit-que", function (req, res) {
     req_body.options = JSON.stringify(req_body.options);
 
     (async () => {
-        let single_que = await Module.T_Question.update(req_body, {
+        let single_que = await Module.Question.update(req_body, {
             where: {
                 id: req_body.id,
             },
@@ -109,7 +109,7 @@ router.post("/del-que", function (req, res) {
     console.log("删除题目所提交的id：", Id);
 
     (async () => {
-        let single_que = await Module.T_Question.destroy({
+        let single_que = await Module.Question.destroy({
             where: {
                 id: Id,
             },

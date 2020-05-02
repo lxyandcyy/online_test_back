@@ -12,27 +12,23 @@ User.init(
             type: DataTypes.BIGINT,
             primaryKey: true,
             autoIncrement: true,
-            allowNull: false,
         },
-        user_id: {
+        userId: {
             type: DataTypes.STRING(20),
             unique: true,
         },
         password: DataTypes.STRING(255),
-        user_type: DataTypes.STRING(20),
-        reg_time: DataTypes.STRING(20),
+        userType: DataTypes.ENUM("USER", "ADMIN"),
+        /** 注册时间 */
+        regTime: {
+            type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW,
+        },
     },
     {
         sequelize,
-        tableName: "user_info",
+        tableName: "user",
     }
 );
-
-User.findOne({
-    user_id: "hahaddhhaha",
-}).then((user) => {
-    userInstance = user.get({ plain: true });
-    console.log(userInstance.user_id);
-});
 
 module.exports = User;
