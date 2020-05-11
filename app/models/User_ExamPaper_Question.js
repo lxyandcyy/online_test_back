@@ -11,16 +11,11 @@ User_ExamPaper_Question.init(
             autoIncrement: true,
         },
         /** 外键 */
-        // userId: DataTypes.BIGINT,
-        // examPaper_QuestionId: DataTypes.BIGINT,
+        // questionId: DataTypes.BIGINT,
+        // user_ExamPaperId: DataTypes.BIGINT,
+        // optionId: DataTypes.BIGINT,
         /** 题目是否做正确 */
         correct: DataTypes.BOOLEAN,
-        /** 做题时间 */
-        // TODO: 移到新表 User_ExamPaper
-        doTime: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
-        },
     },
     {
         sequelize,

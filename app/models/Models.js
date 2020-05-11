@@ -7,19 +7,27 @@ const PracticePaper = require("./PracticePaper");
 const PracticePaper_Question = require("./PracticePaper_Question.js");
 const User_ExamPaper_Question = require("./User_ExamPaper_Question");
 const ExamPaper_Question = require("./ExamPaper_Question");
+const User_ExamPaper = require("./User_ExamPaper");
 
 /**
- * User 和 ExamPaper_Question 表
+ * Question 和 User_ExamPaper 表
  * 用户的做题试卷信息
  */
-User.belongsToMany(ExamPaper_Question, {
+Question.belongsToMany(User_ExamPaper, {
     through: User_ExamPaper_Question,
-    foreignKey: "userId",
+    foreignKey: "questionId",
 });
-ExamPaper_Question.belongsToMany(User, {
+User_ExamPaper.belongsToMany(Question, {
     through: User_ExamPaper_Question,
-    foreignKey: "examPaper_QuestionId",
+    foreignKey: "user_ExamPaperId",
 });
+
+/**
+ * User_ExamPaper_Question 和 Option 表
+ * 用户的做题试卷信息
+ */
+Option.hasMany(User_ExamPaper_Question);
+User_ExamPaper_Question.belongsTo(Option);
 
 /**
  * PracticePaper 和 Subject 关联
@@ -67,6 +75,20 @@ Question.belongsToMany(ExamPaper, {
 });
 
 /**
+ * ExamPaper 和 User 关联
+ * ExamPaper 里的 User
+ * User 在哪些 ExamPaper里
+ */
+ExamPaper.belongsToMany(User, {
+    through: User_ExamPaper,
+    foreignKey: "examPaperId",
+});
+User.belongsToMany(ExamPaper, {
+    through: User_ExamPaper,
+    foreignKey: "userId",
+});
+
+/**
  * ExamPaper 和 Subject 关联
  * ExamPaper 的 Subject
  */
@@ -110,12 +132,7 @@ module.exports = {
     ExamPaper: ExamPaper,
     PracticePaper: PracticePaper,
     PracticePaper_Question: PracticePaper_Question,
+    User_ExamPaper: User_ExamPaper,
+    ExamPaper_Question: ExamPaper_Question,
     User_ExamPaper_Question: User_ExamPaper_Question,
 };
-
-ExamPaper.findByPk(1)
-    .then(async (res) => {
-        console.log(await res.paperScore);
-        return res.getQuestions();
-    })
-    .then((res) => {});

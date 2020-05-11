@@ -4,6 +4,8 @@ var Module = require("../models/Models");
 let axios = require("axios");
 let qs = require("qs");
 let jwt = require("jsonwebtoken");
+var Service = require("../service/Service");
+let TimeConverse = require("../util/timeConverse.js");
 
 /*
 路径：/user/getToken  
@@ -25,90 +27,59 @@ router.post("/getToken", function (req, res) {
 /*
 路径：/user/regInfo 用户基本信息注册
 */
-router.post("/regInfo", function (req, res) {
-    const req_body = req.body;
-    console.log(req_body);
+router.post("/regInfo", async function (req, res) {
+    const reqBody = req.body;
+    //查找数据库是否有相同用户，没有则能注册，有则返回查询结果
+    const [user, created] = await Service.User.findOrCreateUser(
+        { userId: reqBody.user_id },
+        reqBody
+    );
 
-    //   查询是否用户已注册
-    const isReg = async function () {
-        let UserInfo = await Module.User.findAll({
-            where: {
-                userId: req_body.username,
-            },
+    if (created) {
+        res.json({
+            code: 200,
+            msg: "用户注册成功",
+            data: user,
         });
-        return UserInfo;
-    };
-
-    // 向数据库添加新用户信息
-    (async () => {
-        let isreg = await isReg(); //判断用户是否重复注册
-        if (isreg.length == 0) {
-            //数据库没有此用户，能注册
-            console.log("数据库中于此用户名相同的有：", isreg);
-            //注册时间格式处理
-            let time = new Date(req_body.regTime);
-            req_body.regTime = `${time.getFullYear()}-${
-                time.getMonth() + 1
-            }-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
-
-            let UserInfo = await Module.User.create(req_body); //创建新用户
-
-            console.log("注册新用户: " + JSON.stringify(UserInfo));
-            res.json({
-                state: 200,
-                msg: "用户注册成功",
-            });
-        } else {
-            //已有相同用户，不能注册
-            res.json({
-                state: 400,
-                msg: "用户已被注册",
-            });
-        }
-    })();
+    } else {
+        res.json({
+            code: 400,
+            msg: "用户已存在",
+            data: user,
+        });
+    }
 });
 
 /*
 路径：/user/detectInfo  验证用户基本信息，如账号密码
 */
-router.post("/detectInfo", function (req, res) {
-    const req_body = req.body;
-
+router.post("/detectInfo", async function (req, res) {
+    const reqBody = req.body;
     //查询是否有该用户
-    const hasUser = async function () {
-        let UserInfo = await Module.User.findAll({
-            where: {
-                userId: req_body.username,
-            },
-        });
-        return UserInfo;
-    };
+    const user = await Service.User.findUser({
+        userId: reqBody.user_id,
+        userType: reqBody.user_type,
+    });
 
-    //验证账户、密码
-    (async () => {
-        let hasuser = await hasUser(); //判断用户是否存在
-        const user = hasuser[0];
-        //数据库有此用户，且密码正确
-        if (hasuser.length !== 0 && user.password === req_body.password) {
-            res.json({
-                state: 200,
-                msg: "账户验证成功！",
-            });
-        } else if (hasuser.length === 0) {
-            res.json({
-                state: 400,
-                msg: "没有此用户！",
-            });
-        } else if (
-            hasuser.length !== 0 &&
-            hasuser.password !== req_body.password
-        ) {
-            res.json({
-                state: 401,
-                msg: "密码错误！",
-            });
-        }
-    })();
+    if (user === null) {
+        res.json({
+            code: 400,
+            msg: "用户不存在！请先注册",
+            data: null,
+        });
+    }
+    //验证密码是否正确
+    else if (user !== null && user.password === reqBody.password) {
+        res.json({
+            code: 200,
+            msg: "账户验证成功！",
+        });
+    } else if (user !== null && user.password !== reqBody.password) {
+        res.json({
+            code: 401,
+            msg: "密码错误！请重新输入",
+        });
+    }
 });
 
 /*
@@ -219,7 +190,7 @@ router.post("/update-user", function (req, res) {
         console.log("更新用户信息: " + JSON.stringify(UserInfo));
 
         res.json({
-            state: 200,
+            code: 200,
             msg: "更新用户信息成功",
         });
     })();
