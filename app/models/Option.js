@@ -15,7 +15,6 @@ Option.init(
         // },
         label: {
             type: DataTypes.STRING(1),
-            unique: true,
         },
         description: {
             type: DataTypes.STRING(255),

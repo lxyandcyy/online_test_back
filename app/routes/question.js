@@ -1,73 +1,69 @@
 var express = require("express");
 let router = express.Router();
-var Module = require("../models/Models");
+var Service = require("../service/Service");
+let Models = require("../models/Models");
 let axios = require("axios");
 let qs = require("qs");
 
 /*
-路径：/question/list  获取题库中题目
+路径：/question  获取题库中题目
 */
-router.get("/list", function (req, res) {
-    (async () => {
-        let T_Question = await Module.Question.findAll();
-        let dataValues = [];
-
-        for (let p of T_Question) {
-            dataValues.push(p);
-        }
-        res.json(dataValues);
-    })();
+router.get("/", async function (req, res) {
+    Service.Question.findQuestions()
+        .then((questions) => {
+            res.json({ code: 200, msg: "获取所有题目成功！", data: questions });
+        })
+        .catch((err) => {
+            res.json({ code: 500, msg: "获取所有题目失败！", data: err });
+        });
 });
 
 /*
-路径：/question/sel-que  获取单个题目
+路径：/question/:id 获取单个题目
 */
-router.get("/sel-que", function (req, res) {
-    req_query = req.query;
-    console.log(req_query);
-
-    (async () => {
-        let T_Question = await Module.Question.findAll({
-            where: {
-                id: req_query.id,
-            },
+router.get("/:id", async function (req, res) {
+    console.log(req.params.id);
+    Service.Question.findQuestion({ id: req.params.id })
+        .then((question) => {
+            if (question) {
+                res.json({
+                    code: 200,
+                    msg: "获取单个题目成功！",
+                    data: question,
+                });
+            } else {
+                res.json({
+                    code: 400,
+                    msg: "没有找到此题目！",
+                    data: question,
+                });
+            }
+        })
+        .catch((err) => {
+            res.json({ code: 500, msg: "获取所有题目失败！", data: err });
         });
-        let dataValues = [];
-
-        for (let p of T_Question) {
-            dataValues.push(p);
-        }
-        res.json(dataValues);
-    })();
 });
 
 /*
-路径：/question/add-que  给题库添加题目
+路径：/question/add  添加题目
 */
-router.post("/add-que", function (req, res) {
-    let req_body = req.body;
-
-    //创建题目时间 格式处理
-    let time = new Date(req_body.createTime);
-    req_body.createTime = `${time.getFullYear()}-${
-        time.getMonth() + 1
-    }-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
-
-    //   生成随机id
-    // req_body.id = Math.random() * 1000;
-    //   options格式处理
-    req_body.options = JSON.stringify(req_body.options);
-
-    console.log("数据处理后的req_body:", req_body);
-    (async () => {
-        let T_Question = await Module.Question.create(req_body); //新增题目
-
-        console.log("新增题目: " + JSON.stringify(T_Question));
-        res.json({
-            state: 200,
-            msg: "新增题目成功",
-        });
-    })();
+router.post("/add", async function (req, res) {
+    let question = await Service.Question.createQuestion(req.body);
+    let myOptions = req.body.options;
+    myOptions = await Promise.all(
+        myOptions.map((item) => {
+            return Models.Option.create(item);
+        })
+    );
+    question.addOptions(myOptions);
+    res.json({
+        data: {
+            question: question,
+            options: myOptions.map((item) => {
+                return item.get({ plain: true });
+            }),
+        },
+    });
 });
 
 /*
@@ -102,25 +98,18 @@ router.post("/edit-que", function (req, res) {
 });
 
 /*
-路径： question/del-que  删除题目
+路径： question/delete/:id  删除题目
 */
-router.post("/del-que", function (req, res) {
-    let Id = req.body.id;
-    console.log("删除题目所提交的id：", Id);
+router.post("/delete/:id", async function (req, res) {
+    let [destoryCount, question] = await Service.Question.destoryQuestion({
+        id: req.params.id,
+    });
 
-    (async () => {
-        let single_que = await Module.Question.destroy({
-            where: {
-                id: Id,
-            },
-        }); //删除题目
-        console.log("删除题目: " + JSON.stringify(single_que));
-
-        res.json({
-            state: 200,
-            msg: "题目删除成功",
-        });
-    })();
+    res.json({
+        state: 200,
+        msg: `删除${destoryCount}条记录`,
+        data: question,
+    });
 });
 
 module.exports = router;

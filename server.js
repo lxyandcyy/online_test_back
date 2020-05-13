@@ -6,6 +6,7 @@ var bodyParser = require("body-parser");
 let user = require("./app/routes/user");
 let question = require("./app/routes/question");
 let paper = require("./app/routes/paper");
+let subject = require("./app/routes/subject");
 let verifyToken = require("./app/routes/verifyToken");
 let practicePaper = require("./app/routes/practicePaper");
 
@@ -35,6 +36,7 @@ app.use(
 app.use("/user", user);
 app.use("/question", question);
 app.use("/paper", paper);
+app.use("/subject", subject);
 app.use("/verify-token", verifyToken);
 app.use("/practice-paper", practicePaper);
 

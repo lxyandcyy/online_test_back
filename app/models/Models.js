@@ -131,6 +131,8 @@ module.exports = {
     Question: Question,
     ExamPaper: ExamPaper,
     PracticePaper: PracticePaper,
+    Subject: Subject,
+    Option: Option,
     PracticePaper_Question: PracticePaper_Question,
     User_ExamPaper: User_ExamPaper,
     ExamPaper_Question: ExamPaper_Question,

@@ -1,11 +1,9 @@
 var express = require("express");
 let router = express.Router();
-var Module = require("../models/Models");
 let axios = require("axios");
 let qs = require("qs");
-let jwt = require("jsonwebtoken");
 var Service = require("../service/Service");
-let TimeConverse = require("../util/timeConverse.js");
+let Token = require("../util/Token.js");
 
 /*
 路径：/user/getToken  
@@ -25,7 +23,7 @@ router.post("/getToken", function (req, res) {
 });
 
 /*
-路径：/user/regInfo 用户基本信息注册
+路径：/user/regInfo 用户基本信息提交
 */
 router.post("/regInfo", async function (req, res) {
     const reqBody = req.body;
@@ -38,7 +36,7 @@ router.post("/regInfo", async function (req, res) {
     if (created) {
         res.json({
             code: 200,
-            msg: "用户注册成功",
+            msg: "用户基本信息提交成功",
             data: user,
         });
     } else {
@@ -92,6 +90,7 @@ router.post("/regFace", function (req, res) {
             qs.stringify(req.body)
         )
         .then((response) => {
+            console.log(req.body);
             res.json(response.data);
         })
         .catch((error) => {
@@ -103,23 +102,15 @@ router.post("/regFace", function (req, res) {
 路径：/user/Login 用户通过人脸base64照片登录
 */
 router.post("/Login", function (req, res) {
-    // 用jwt生成用户身份验证的token
-    let log_token = jwt.sign(
-        {
-            username: req.body.username,
-            exp: Math.floor(Date.now() / 1000) + 60 * 60,
-        },
-        "secret"
-    );
-
-    console.log("jwt生成的token:", log_token);
-
+    let reqBody = req.body;
     axios
         .post(
             "https://aip.baidubce.com/rest/2.0/face/v3/search",
-            qs.stringify(req.body)
+            qs.stringify(reqBody)
         )
         .then((response) => {
+            // 用jwt生成用户身份验证的token
+            let log_token = Token.createToken({ user_id: reqBody.user_id });
             response.data["log_token"] = log_token;
             res.json(response.data);
         })
@@ -148,52 +139,42 @@ router.post("/changeFace", function (req, res) {
 /*
 路径：/user/allUserInfo  所有用户基本信息获取
 */
-router.get("/allUserInfo", function (req, res) {
-    (async () => {
-        let UserInfo = await Module.User.findAll();
-        let dataValues = [];
-
-        for (let p of UserInfo) {
-            dataValues.push(JSON.parse(JSON.stringify(p)));
-        }
-        res.json(dataValues);
-    })();
+router.get("/allUserInfo", async function (req, res) {
+    let users = await Service.User.findUsers();
+    res.json({
+        code: 200,
+        msg: "获取所有用户信息成功！",
+        data: users,
+    });
 });
 
 /*
 路径：/user/sel-user  单个用户基本信息获取
 */
-router.get("/sel-user", function (req, res) {
-    (async () => {
-        let UserInfo = await Module.User.findAll({
-            where: {
-                userId: req.query.username,
-            },
-        });
-        let dataValues = [];
-
-        dataValues.push(UserInfo[0]);
-        res.json(dataValues[0]);
-    })();
+router.get("/sel-user", async function (req, res) {
+    let user = await Service.User.findUser({ userId: req.query.user_id });
+    res.json({
+        code: 200,
+        msg: "获取单个用户信息成功！",
+        data: user,
+    });
 });
 
 /*
-路径：/user/update-user  单个用户基本信息获取
+路径：/user/update-user  更新单个用户信息
 */
-router.post("/update-user", function (req, res) {
-    (async () => {
-        let UserInfo = await Module.User.update(req.body, {
-            where: {
-                username: req.body.username,
-            },
-        });
-        console.log("更新用户信息: " + JSON.stringify(UserInfo));
-
-        res.json({
-            code: 200,
-            msg: "更新用户信息成功",
-        });
-    })();
+router.post("/update-user", async function (req, res) {
+    let affectCount = await Service.User.updateUser(
+        { userId: req.body.user_id },
+        req.body
+    );
+    let user = await Service.User.findUser({ userId: req.body.user_id });
+    res.json({
+        code: 200,
+        msg: "更新用户信息成功",
+        description: `更新了${affectCount}条记录`,
+        data: user,
+    });
 });
 
 module.exports = router;
