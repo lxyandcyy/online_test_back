@@ -22,26 +22,21 @@ router.get("/", async function (req, res) {
 路径：/question/:id 获取单个题目
 */
 router.get("/:id", async function (req, res) {
-    console.log(req.params.id);
-    Service.Question.findQuestion({ id: req.params.id })
-        .then((question) => {
-            if (question) {
-                res.json({
-                    code: 200,
-                    msg: "获取单个题目成功！",
-                    data: question,
-                });
-            } else {
-                res.json({
-                    code: 400,
-                    msg: "没有找到此题目！",
-                    data: question,
-                });
-            }
-        })
-        .catch((err) => {
-            res.json({ code: 500, msg: "获取所有题目失败！", data: err });
+    let question = await Service.Question.findQuestion({ id: req.params.id });
+    if (question) {
+        let options = await question.getOptions();
+        res.json({
+            code: 200,
+            msg: "获取单个题目成功！",
+            data: { question: question, options: options },
         });
+    } else {
+        res.json({
+            code: 400,
+            msg: "没有找到此题目！",
+            data: question,
+        });
+    }
 });
 
 /*
@@ -57,6 +52,8 @@ router.post("/add", async function (req, res) {
     );
     question.addOptions(myOptions);
     res.json({
+        code: 200,
+        msg: "题目新增成功！",
         data: {
             question: question,
             options: myOptions.map((item) => {
@@ -67,9 +64,9 @@ router.post("/add", async function (req, res) {
 });
 
 /*
-路径：/question/edit-que  编辑题目
+路径：/question/edit/:id  编辑题目
 */
-router.post("/edit-que", function (req, res) {
+router.post("/edit/:id", function (req, res) {
     let req_body = req.body;
     console.log("编辑题目所提交的数据：", req_body);
 
@@ -104,7 +101,7 @@ router.post("/delete/:id", async function (req, res) {
     let [destoryCount, question] = await Service.Question.destoryQuestion({
         id: req.params.id,
     });
-
+    question.removeOptions();
     res.json({
         state: 200,
         msg: `删除${destoryCount}条记录`,

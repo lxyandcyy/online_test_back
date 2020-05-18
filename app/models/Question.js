@@ -27,6 +27,7 @@ Question.init(
         analysis: DataTypes.STRING(20),
     },
     {
+        hooks: { beforeDestroy(instance, options) {} },
         sequelize,
         tableName: "question",
     }

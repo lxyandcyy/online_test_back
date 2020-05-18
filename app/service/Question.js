@@ -32,7 +32,7 @@ class Question {
 
     //TODO: 删除question
     static async destoryQuestion(condition) {
-        let question = Question.findQuestion(condition);
+        let question = await Question.findQuestion(condition);
         let destoryCount = await Module.Question.destroy({
             where: condition,
         });
