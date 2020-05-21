@@ -7,7 +7,7 @@ class Token {
     static createToken(condition) {
         let log_token = jwt.sign(
             {
-                ...condition,
+                condition,
                 exp: Math.floor(Date.now() / 1000) + 60 * 60,
             },
             "secret"
