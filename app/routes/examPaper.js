@@ -55,7 +55,7 @@ router.post("/add", async function (req, res) {
     console.log("传入：", req.body);
     let [examPaper, record] = await Service.ExamPaper.addPaper(req.body);
     res.json({
-        state: 200,
+        code: 200,
         msg: "新增试卷成功",
         data: { examPaper: examPaper, record: record },
     });

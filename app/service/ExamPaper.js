@@ -129,6 +129,7 @@ class ExamPaper {
     static async addPaper(reqBody) {
         let examPaper = await Module.ExamPaper.create({
             ...reqBody,
+            isPublish: false,
             createTime: TimeConverse.timestampToDate(Date.now()),
         });
         const records = reqBody.questions.map((question) => {
@@ -148,7 +149,6 @@ class ExamPaper {
         let count = await Module.ExamPaper.update(
             {
                 ...reqBody,
-                startTime: TimeConverse.timestampToDate(Date.now()),
             },
             {
                 where: condition,
