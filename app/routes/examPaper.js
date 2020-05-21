@@ -5,6 +5,22 @@ var Service = require("../service/Service");
 let axios = require("axios");
 let qs = require("qs");
 
+router.post("/do-exam", async function (req, res) {
+    try {
+        const data = await Service.ExamPaper.doExamPaper(req.body);
+        return res.json({
+            code: 200,
+            msg: "成功提交试卷",
+            data,
+        });
+    } catch {
+        return res.json({
+            code: 400,
+            msg: "发生了错误",
+        });
+    }
+});
+
 /*
 路径：/exam-paper 获取所有试卷
 */
