@@ -16,10 +16,12 @@ const User_ExamPaper = require("./User_ExamPaper");
 Question.belongsToMany(User_ExamPaper, {
     through: User_ExamPaper_Question,
     foreignKey: "questionId",
+    uniqueKey: false,
 });
 User_ExamPaper.belongsToMany(Question, {
     through: User_ExamPaper_Question,
     foreignKey: "user_ExamPaperId",
+    uniqueKey: false,
 });
 
 /**
