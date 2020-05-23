@@ -5,22 +5,6 @@ var Service = require("../service/Service");
 let axios = require("axios");
 let qs = require("qs");
 
-router.post("/do-exam", async function (req, res) {
-    try {
-        const data = await Service.ExamPaper.doExamPaper(req.body);
-        return res.json({
-            code: 200,
-            msg: "成功提交试卷",
-            data,
-        });
-    } catch {
-        return res.json({
-            code: 400,
-            msg: "发生了错误",
-        });
-    }
-});
-
 /*
 路径：/exam-paper 获取所有试卷
 */
@@ -52,7 +36,6 @@ router.get("/:id", async function (req, res) {
 路径：/exam-paper/add 新增试卷
 */
 router.post("/add", async function (req, res) {
-    console.log("传入：", req.body);
     let [examPaper, record] = await Service.ExamPaper.addPaper(req.body);
     res.json({
         code: 200,
@@ -138,29 +121,21 @@ router.post("/delete/:id", async function (req, res) {
 路径：/exam-paper/submit 提交答题卡
 */
 router.post("/submit", async function (req, res) {
-    //TODO：保存答题数据
-    await Service.ExamPaper.saveAnswerSheet(req.body)
-        .then(async () => {
-            // TODO: 计算总分
-            // let userScore = await Service.ExamPaper.calculateUserScore2(
-            //     req.body.userId,
-            //     req.body.examPaperId,
-            //     req.body.questions
-            // );
-            res.json({
-                state: 200,
-                msg: "提交答题卡成功",
-                data: 80,
-            });
-        })
-        .catch((err) => {
-            console.log(err);
-            res.json({
-                code: 500,
-                msg: "用户已提交该试卷，不能重复提交",
-                data: err,
-            });
+    try {
+        const data = await Service.User_ExamPaper.submitExamPaper(req.body);
+        return res.json({
+            code: 200,
+            msg: "成功提交试卷",
+            data,
         });
+    } catch (err) {
+        console.log(err);
+        return res.json({
+            code: 400,
+            msg: "发生了错误",
+            err: err.message,
+        });
+    }
 });
 
 /*

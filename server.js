@@ -9,6 +9,7 @@ let examPaper = require("./app/routes/examPaper");
 let subject = require("./app/routes/subject");
 let verifyToken = require("./app/routes/verifyToken");
 let practicePaper = require("./app/routes/practicePaper");
+let records = require("./app/routes/records");
 
 let cors = require("cors");
 
@@ -39,6 +40,7 @@ app.use("/exam-paper", examPaper);
 app.use("/subject", subject);
 app.use("/verify-token", verifyToken);
 app.use("/practice-paper", practicePaper);
+app.use("/records", records);
 
 let server = app.listen(ServerConfig.port, function () {
     console.log("服务器打开了--> http://localhost:6001/");
