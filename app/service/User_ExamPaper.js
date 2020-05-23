@@ -5,16 +5,81 @@ class User_ExamPaper {
     constructor() {}
 
     // TODO：查找所有考试记录
-    static async findRecords(userId) {
-        console.log(userId);
-        const records = await Module.User_ExamPaper.findAll({
-            where: {
-                userId: userId,
+    /**
+     * @param {{userId: Number, examPaperId: Number}} params 用户id和examPaperId
+     * @returns {Promise<any>}
+     */
+    static async findRecords(params) {
+        const { examPaperId, userId } = params;
+
+        /* 找出该试卷的所有试题 */
+        const currentExamPaper = await Module.ExamPaper.findByPk(examPaperId, {
+            include: {
+                model: Module.Question,
+                include: {
+                    model: Module.Option,
+                },
             },
         });
-        return records;
+        const allQuestions = currentExamPaper.get({ plain: true }).Questions;
+        const paperScore = await currentExamPaper.paperScore;
+
+        const allQuestionMap = {};
+        allQuestions.map((item, index) => {
+            allQuestionMap[item.id] = index;
+            item.score = item.ExamPaper_Question.score;
+            delete item.ExamPaper_Question;
+        });
+
+        const res = await Module.User_ExamPaper.findOne({
+            where: {
+                examPaperId,
+                userId,
+            },
+            include: {
+                model: Module.Question,
+            },
+        });
+        const data = res.get({ plain: true });
+        /* 用户做题的记录 */
+        const records = data.Questions;
+        for (let i = 0; i < records.length; i++) {
+            const { OptionId, correct } = records[i].User_ExamPaper_Question;
+            /* 通过题目的id查找对应的index，添加到属性里去 */
+            const index = allQuestionMap[records[i].id];
+            if (index !== undefined) {
+                allQuestions[index].status = {
+                    OptionId,
+                    correct,
+                };
+            } else {
+                allQuestions[index].status = null;
+            }
+        }
+
+        const examPaper = currentExamPaper.get({ plain: true });
+        delete examPaper.Questions;
+        examPaper.paperScore = paperScore;
+        return {
+            examPaper,
+            records: allQuestions,
+        };
     }
 
+    /**
+     * 判断用户是否做过此试卷
+     * @param userId 用户id
+     * @param examPaperId 试卷id
+     * @returns {Promise<Boolean>} 用户是否做了该试卷
+     */
+    static async isUserDidExamPaper(userId, examPaperId) {
+        return !!Module.User_ExamPaper.findOne({
+            where: {
+                userId,
+                examPaperId,
+            },
+        });
+    }
     /**
      * TODO：提交答题卡
      * @typedef {Object} QuestionRecord 返回的题目记录
@@ -35,6 +100,9 @@ class User_ExamPaper {
      * @returns { Promise<QuestionRecord> }
      */
     static async submitExamPaper(data) {
+        if (this.isUserDidExamPaper(data.userId, data.examPaperId)) {
+            throw new Error("用户已经做过该试题");
+        }
         /* 每道题的选项映射，通过此数据结构能够更快查询到某题目的选项 */
         const allOptions = data.options.reduce((map, item) => {
             map[item.questionId] = item.optionId;
