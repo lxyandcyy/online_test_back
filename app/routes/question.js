@@ -40,6 +40,26 @@ router.get("/:id", async function (req, res) {
 });
 
 /*
+路径：/question/options 获取一些题目的optioins
+*/
+router.post("/options", async function (req, res) {
+    let questions = await Service.Option.findOptions(req.body["allQuestion"]);
+    if (questions) {
+        res.json({
+            code: 200,
+            msg: "获取一些题目的选项成功！",
+            data: questions,
+        });
+    } else {
+        res.json({
+            code: 400,
+            msg: "没有找到题目！",
+            data: questions,
+        });
+    }
+});
+
+/*
 路径：/question/add  添加题目
 */
 router.post("/add", async function (req, res) {
