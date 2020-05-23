@@ -9,7 +9,7 @@ class User_ExamPaper {
      * @param {{userId: Number, examPaperId: Number}} params 用户id和examPaperId
      * @returns {Promise<any>}
      */
-    static async findRecords(params) {
+    static async findRecord(params) {
         const { examPaperId, userId } = params;
 
         /* 找出该试卷的所有试题 */

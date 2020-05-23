@@ -21,10 +21,10 @@ router.get("/:id", async function (req, res) {
 });
 
 /*
-路径：/records/:userId/:examPaperId  查询答题卡
+路径：/records?userId&examPaperId  查询答题卡
 */
 router.get("/", async function (req, res) {
-    Service.User_ExamPaper.findRecords(req.query)
+    Service.User_ExamPaper.findRecord(req.query)
         .then((records) => {
             res.json({
                 code: 200,
