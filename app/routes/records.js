@@ -23,9 +23,8 @@ router.get("/:id", async function (req, res) {
 /*
 路径：/records/:userId/:examPaperId  查询答题卡
 */
-router.get("/:userId/:examPaperId", async function (req, res) {
-    console.log(req.params);
-    Service.User_ExamPaper.findRecords(req.params.id)
+router.get("/", async function (req, res) {
+    Service.User_ExamPaper.findRecords(req.query)
         .then((records) => {
             res.json({
                 code: 200,
@@ -34,7 +33,8 @@ router.get("/:userId/:examPaperId", async function (req, res) {
             });
         })
         .catch((err) => {
-            res.json({ code: 500, msg: "未知错误", data: err });
+            console.log(err);
+            res.json({ code: 500, msg: "未知错误", data: err.message });
         });
 });
 
