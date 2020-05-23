@@ -20,22 +20,4 @@ router.get("/:id", async function (req, res) {
         });
 });
 
-/*
-路径：/records/:userId/:examPaperId  查询答题卡
-*/
-router.get("/:userId/:examPaperId", async function (req, res) {
-    console.log(req.params);
-    Service.User_ExamPaper.findRecords(req.params.id)
-        .then((records) => {
-            res.json({
-                code: 200,
-                msg: "获取所有考试记录成功！",
-                data: records,
-            });
-        })
-        .catch((err) => {
-            res.json({ code: 500, msg: "未知错误", data: err });
-        });
-});
-
 module.exports = router;
