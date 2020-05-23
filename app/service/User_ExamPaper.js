@@ -3,9 +3,22 @@ const Op = require("sequelize").Op;
 
 class User_ExamPaper {
     constructor() {}
-
-    // TODO：查找所有考试记录
     /**
+     * 查找某个用户的所有考试记录
+     * @param {Number} userId 
+     */
+    static async findRecords(userId) {
+        console.log(userId);
+        const records = await Module.User_ExamPaper.findAll({
+            where: {
+                userId: userId,
+            },
+        });
+        return records;
+    }
+
+    /**
+     * 查找某个用户的，某个试卷的考试记录
      * @param {{userId: Number, examPaperId: Number}} params 用户id和examPaperId
      * @returns {Promise<any>}
      */
