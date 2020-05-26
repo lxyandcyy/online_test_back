@@ -4,6 +4,7 @@ var Module = require("../models/Models");
 var Service = require("../service/Service");
 let axios = require("axios");
 let qs = require("qs");
+const { updateByPkInRoute } = require("../util/CRUDUtil");
 
 /*
 路径：/exam-paper 获取所有试卷
@@ -142,22 +143,13 @@ router.post("/submit", async function (req, res) {
 路径：/exam-paper/update/:id 更新试卷
 */
 router.post("/update/:id", async function (req, res) {
-    await Service.ExamPaper.updatePaper(
-        {
-            id: req.params.id,
-        },
-        req.body
-    )
-        .then((examPaper) => {
-            res.json({
-                code: 500,
-                msg: `更新试卷失败！`,
-                data: null,
-            });
-        })
-        .catch((err) =>
-            res.json({ code: 400, msg: "未找到该试卷", data: null })
-        );
+    await updateByPkInRoute(
+        req,
+        res,
+        req.params.id,
+        req.body,
+        Module.ExamPaper
+    );
 });
 
 /*
