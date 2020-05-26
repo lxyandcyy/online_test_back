@@ -1,5 +1,6 @@
 var Module = require("../models/Models");
 let TimeConverse = require("../util/timeConverse.js");
+const { updateByPk } = require("../util/CRUDUtil");
 
 class Question {
     constructor() {}
@@ -55,14 +56,13 @@ class Question {
         return [destoryCount, question];
     }
 
-    //TODO: 更新question信息
-    static async updateQuestion(condition, reqBody) {
-        console.log(reqBody);
-        const affectCount = await Module.Question.update(reqBody.question, {
-            where: condition,
-        });
-
-        return affectCount;
+    /**
+     * @param primaryKey 主键
+     * @param data 更新数据
+     * @returns {Promise<void>}
+     */
+    static async updateQuestion(primaryKey, data) {
+        return updateByPk(primaryKey, data, Module.Question);
     }
 }
 

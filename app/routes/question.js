@@ -4,6 +4,7 @@ var Service = require("../service/Service");
 let Models = require("../models/Models");
 let axios = require("axios");
 let qs = require("qs");
+const { updateByPkInRoute } = require("../util/CRUDUtil");
 
 /*
 路径：/question  获取题库中题目
@@ -83,6 +84,9 @@ router.post("/add", async function (req, res) {
     });
 });
 
+router.post("/update/:id", async function (req, res) {
+    await updateByPkInRoute(req, res, req.params.id, req.body, Models.Question);
+});
 /*
 路径：/question/update/:id  更新题目
 */

@@ -2,6 +2,7 @@ var Module = require("../models/Models");
 let Service = require("../service/Service");
 let TimeConverse = require("../util/timeConverse.js");
 const Op = require("sequelize").Op;
+const { updateByPk } = require("../util/CRUDUtil");
 
 class ExamPaper {
     constructor() {}
@@ -66,11 +67,14 @@ class ExamPaper {
         return count;
     }
 
-    // TODO: 更新试卷
-    static async updatePaper(condition, reqBody) {
-        await ExamPaper.destoryPaper(condition);
-        let examPaper = await ExamPaper.addPaper(reqBody);
-        return examPaper;
+    /**
+     * 更新试卷
+     * @param primaryKey 主键
+     * @param reqBody 数据
+     * @returns {Promise<*>}
+     */
+    static async updatePaper(primaryKey, reqBody) {
+        return updateByPk(primaryKey, reqBody, Module.ExamPaper);
     }
 
     // TODO: 删除试卷
