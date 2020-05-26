@@ -84,34 +84,25 @@ router.post("/add", async function (req, res) {
 });
 
 /*
-路径：/question/edit/:id  编辑题目
+路径：/question/update/:id  更新题目
 */
-router.post("/edit/:id", function (req, res) {
-    let req_body = req.body;
-    console.log("编辑题目所提交的数据：", req_body);
-
-    //编辑题目时间 格式处理
-    let time = new Date(req_body.createTime);
-    req_body.createTime = `${time.getFullYear()}-${
-        time.getMonth() + 1
-    }-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
-
-    //   options格式处理
-    req_body.options = JSON.stringify(req_body.options);
-
-    (async () => {
-        let single_que = await Module.Question.update(req_body, {
-            where: {
-                id: req_body.id,
-            },
-        }); //更新题目数据
-        console.log("编辑题目: " + JSON.stringify(single_que));
-
-        res.json({
-            state: 200,
-            msg: "编辑题目成功",
-        });
-    })();
+router.post("/update/:id", function (req, res) {
+    Service.Question.updateQuestion(
+        {
+            id: req.params.id,
+        },
+        req.body
+    )
+        .then((question) => {
+            res.json({
+                code: 200,
+                msg: "更新题目成功！",
+                data: question,
+            });
+        })
+        .catch((err) =>
+            res.json({ code: 400, msg: "未找到该题目", data: null })
+        );
 });
 
 /*

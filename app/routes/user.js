@@ -177,4 +177,16 @@ router.post("/update-user", async function (req, res) {
     });
 });
 
+/*
+路径：/user/delete  删除单个用户
+*/
+router.post("/delete", async function (req, res) {
+    let user = await Service.User.destroyUsers({ id: req.body.id });
+    res.json({
+        code: 200,
+        msg: "删除单个用户成功！",
+        data: user,
+    });
+});
+
 module.exports = router;

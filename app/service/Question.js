@@ -8,6 +8,14 @@ class Question {
     static async findQuestions(condition) {
         const questions = await Module.Question.findAll({
             where: condition,
+            include: [
+                {
+                    model: Module.Subject,
+                },
+                {
+                    model: Module.User,
+                },
+            ],
         });
         return questions;
     }
@@ -16,6 +24,14 @@ class Question {
     static async findQuestion(condition) {
         const question = await Module.Question.findOne({
             where: condition,
+            include: [
+                {
+                    model: Module.Subject,
+                },
+                {
+                    model: Module.User,
+                },
+            ],
         });
         return question;
     }
@@ -37,6 +53,16 @@ class Question {
             where: condition,
         });
         return [destoryCount, question];
+    }
+
+    //TODO: 更新question信息
+    static async updateQuestion(condition, reqBody) {
+        console.log(reqBody);
+        const affectCount = await Module.Question.update(reqBody.question, {
+            where: condition,
+        });
+
+        return affectCount;
     }
 }
 

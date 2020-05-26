@@ -4,7 +4,8 @@ const Option = require("./Option");
 const Subject = require("./Subject");
 const ExamPaper = require("./ExamPaper");
 const PracticePaper = require("./PracticePaper");
-const PracticePaper_Question = require("./PracticePaper_Question.js");
+const User_PracticePaper = require("./User_PracticePaper");
+const PracticePaper_Question = require("./PracticePaper_Question");
 const User_ExamPaper_Question = require("./User_ExamPaper_Question");
 const ExamPaper_Question = require("./ExamPaper_Question");
 const User_ExamPaper = require("./User_ExamPaper");
@@ -132,10 +133,11 @@ module.exports = {
     User: User,
     Question: Question,
     ExamPaper: ExamPaper,
-    PracticePaper: PracticePaper,
     Subject: Subject,
     Option: Option,
+    PracticePaper: PracticePaper,
     PracticePaper_Question: PracticePaper_Question,
+    User_PracticePaper: User_PracticePaper,
     User_ExamPaper: User_ExamPaper,
     ExamPaper_Question: ExamPaper_Question,
     User_ExamPaper_Question: User_ExamPaper_Question,

@@ -10,6 +10,14 @@ class ExamPaper {
     static async findPapers(condition) {
         const examPapers = await Module.ExamPaper.findAll({
             where: condition,
+            include: [
+                {
+                    model: Module.Subject,
+                },
+                {
+                    model: Module.User,
+                },
+            ],
         });
         return examPapers;
     }

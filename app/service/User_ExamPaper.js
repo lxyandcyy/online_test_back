@@ -5,15 +5,17 @@ class User_ExamPaper {
     constructor() {}
     /**
      * 查找某个用户的所有考试记录
-     * @param {Number} userId 
+     * @param {Number} userId
      */
     static async findRecords(userId) {
-        console.log(userId);
-        const records = await Module.User_ExamPaper.findAll({
-            where: {
-                userId: userId,
-            },
-        });
+        let records = null;
+        if (userId == "undefined") {
+            records = await Module.User_ExamPaper.findAll();
+        } else {
+            records = await Module.User_ExamPaper.findAll({
+                where: { userId: userId },
+            });
+        }
         return records;
     }
 

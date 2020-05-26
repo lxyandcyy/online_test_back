@@ -53,6 +53,13 @@ class User {
         });
         return affectCount;
     }
+
+    // TODO: 删除 user
+    static async destroyUsers(condition) {
+        const users = await Module.User.findAll({ where: condition });
+        const destroyCount = await Module.User.destroy({ where: condition });
+        return [destroyCount, users];
+    }
 }
 
 module.exports = User;

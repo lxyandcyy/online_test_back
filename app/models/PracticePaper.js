@@ -14,7 +14,6 @@ PracticePaper.init(
         name: { type: DataTypes.STRING(20), defaultValue: "智能试卷" },
         /** 外键 */
         // subjectsId: DataTypes.STRING(20),
-        questionCount: DataTypes.INTEGER,
         difficult: DataTypes.INTEGER,
         createTime: { defaultValue: DataTypes.NOW, type: DataTypes.DATE },
     },
