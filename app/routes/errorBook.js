@@ -2,12 +2,9 @@ var express = require("express");
 let router = express.Router();
 var Service = require("../service/Service");
 let Models = require("../models/Models");
-let axios = require("axios");
-let qs = require("qs");
-const { updateByPkInRoute } = require("../util/CRUDUtil");
 
 /*
-路径：/question  获取题库中题目
+路径：/error  获取题库中题目
 */
 router.get("/", async function (req, res) {
     Service.Question.findQuestions()
@@ -20,7 +17,7 @@ router.get("/", async function (req, res) {
 });
 
 /*
-路径：/question/:id 获取单个题目
+路径：/error/:id 获取单个题目
 */
 router.get("/:id", async function (req, res) {
     let question = await Service.Question.findQuestion({ id: req.params.id });
@@ -41,7 +38,7 @@ router.get("/:id", async function (req, res) {
 });
 
 /*
-路径：/question/options 获取一些题目的optioins
+路径：/error/options 获取一些题目的optioins
 */
 router.post("/options", async function (req, res) {
     let questions = await Service.Option.findOptions(req.body["allQuestion"]);
@@ -61,7 +58,7 @@ router.post("/options", async function (req, res) {
 });
 
 /*
-路径：/question/add  添加题目
+路径：/error/add  添加题目
 */
 router.post("/add", async function (req, res) {
     let question = await Service.Question.createQuestion(req.body);
@@ -85,14 +82,7 @@ router.post("/add", async function (req, res) {
 });
 
 /*
-路径：/question/update/:id  更新题目
-*/
-router.post("/update/:id", async function (req, res) {
-    await updateByPkInRoute(req, res, req.params.id, req.body, Models.Question);
-});
-
-/*
-路径： question/delete/:id  删除题目
+路径： error/delete/:id  删除题目
 */
 router.post("/delete/:id", async function (req, res) {
     let [destoryCount, question] = await Service.Question.destoryQuestion({

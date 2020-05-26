@@ -31,6 +31,7 @@ class ExamPaper {
 
         let examPaper_question = await Module.ExamPaper_Question.findAll({
             where: { examPaperId: examPaper.id },
+            include: [Module.Question],
         });
         return [examPaper, examPaper_question];
     }

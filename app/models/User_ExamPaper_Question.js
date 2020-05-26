@@ -19,7 +19,7 @@ User_ExamPaper_Question.init(
     },
     {
         sequelize,
-        tableName: "user__question__exam_paper",
+        tableName: "user_examPaper_que",
     }
 );
 

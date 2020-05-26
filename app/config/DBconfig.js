@@ -5,7 +5,7 @@
 const { Sequelize, DataTypes } = require("sequelize");
 
 var DBconfig = {
-    database: "testonline",
+    database: "test_online",
     username: "root",
     password: "921680",
     host: "localhost",

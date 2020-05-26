@@ -2,11 +2,11 @@ const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../config/DBconfig");
 
 /**
- * User 与 Question 的关联表    考试记录表
+ * User 与 Question 的关联表    错题表
  */
 
 class ErrorBook extends Model {}
-User_ExamPaper.init(
+ErrorBook.init(
     {
         id: {
             type: DataTypes.BIGINT,
