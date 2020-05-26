@@ -84,30 +84,34 @@ router.post("/add", async function (req, res) {
     });
 });
 
-router.post("/update/:id", async function (req, res) {
-    await updateByPkInRoute(req, res, req.params.id, req.body, Models.Question);
-});
 /*
 路径：/question/update/:id  更新题目
 */
-router.post("/update/:id", function (req, res) {
-    Service.Question.updateQuestion(
-        {
-            id: req.params.id,
-        },
-        req.body
-    )
-        .then((question) => {
-            res.json({
-                code: 200,
-                msg: "更新题目成功！",
-                data: question,
-            });
-        })
-        .catch((err) =>
-            res.json({ code: 400, msg: "未找到该题目", data: null })
-        );
+router.post("/update/:id", async function (req, res) {
+    await updateByPkInRoute(req, res, req.params.id, req.body, Models.Question);
 });
+
+/*
+路径：/question/update/:id  更新题目
+*/
+// router.post("/update/:id", function (req, res) {
+//     Service.Question.updateQuestion(
+//         {
+//             id: req.params.id,
+//         },
+//         req.body
+//     )
+//         .then((question) => {
+//             res.json({
+//                 code: 200,
+//                 msg: "更新题目成功！",
+//                 data: question,
+//             });
+//         })
+//         .catch((err) =>
+//             res.json({ code: 400, msg: "未找到该题目", data: null })
+//         );
+// });
 
 /*
 路径： question/delete/:id  删除题目
