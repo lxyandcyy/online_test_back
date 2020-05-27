@@ -31,8 +31,15 @@ class ExamPaper {
 
         let examPaper_question = await Module.ExamPaper_Question.findAll({
             where: { examPaperId: examPaper.id },
-            include: [Module.Question],
         });
+
+        for (const item of examPaper_question) {
+            let question = await Module.Question.findOne({
+                where: { id: item.questionId },
+            });
+            item.setDataValue("topic", question.topic);
+        }
+
         return [examPaper, examPaper_question];
     }
 
@@ -106,105 +113,6 @@ class ExamPaper {
         );
 
         return [user_examPaper, user_examPaper_question];
-    }
-
-    static async calculateUserScore2(userId, examPaperId, questions) {
-        const user_ExamPaper = await Module.User_ExamPaper.findOne({
-            where: {
-                [Op.and]: {
-                    userId: userId,
-                    examPaperId: examPaperId,
-                },
-            },
-        });
-        const user_ExamPaperId = user_ExamPaper.id;
-
-        const records = await Module.User_ExamPaper_Question.findAll({
-            where: {
-                user_ExamPaperId: user_ExamPaperId,
-            },
-        });
-
-        let score = 0;
-        for (let i = 0; i < questions.length; i++) {
-            let question = await Service.Question.findQuestion({
-                id: questions[i].id,
-            });
-            console.log(question.getOptions());
-        }
-
-        // for (let i = 0; i < records.length; i++) {
-        // 找出该题目的选项id
-        // const questionId = records[i].questionId;
-        // const option = questions.find((item) => {
-        //     return item.id === questionId;
-        // });
-        // const optionId = option ? option.OptionId : null;
-        //
-        // console.log(records[i]);
-        // // const options = await (
-        //     await records[i].getQuestion()
-        // ).getOptions();
-        // const isCorrect = options.find((item) => item.id === optionId)
-        //     .isCorrect;
-        // console.log(i + "," + isCorrect);
-        //
-        // records[i].correct = isCorrect;
-        // if (isCorrect) {
-        //     score += (
-        //         await Module.ExamPaper_Question.findOne({
-        //             where: {
-        //                 [Op.and]: {
-        //                     examPaperId: examPaperId,
-        //                     questionId: questions,
-        //                 },
-        //             },
-        //         })
-        //     ).score;
-        // }
-        // await records[i].save();
-        // }
-        // user_ExamPaper.userScore = score;
-        // await user_ExamPaper.save();
-        // return score;
-    }
-
-    static async caculateUserScore(user_examPaper) {
-        // TODO: 判断每道题做的是否正确，存到correct字段
-        // user_examPaper.getQuestions().forEach((item) => {
-        //     console.log(item);
-        // });
-
-        // reqBody.questions.forEach((item) => {
-        //     let map = []; //一道题的选项映射
-        //     for (let i = 0; i < item.options.length; i++) {
-        //         map.push({ i: item.options[i].prefix });
-        //     }
-        //     // 比对答案
-        //     if (item.corrent === map[item.current_option]) {
-        //         item.doRight = true; //用户本题正确
-        //         item.score = 10; //item.question_score;//用户本题得分。。。。待修改
-        //     } else {
-        //         item.doRight = false; //用户本题错误
-        //         item.score = 0;
-        //     }
-        //
-        //     (async () => {
-        //         // 新增考试记录
-        //         let T_Exam_Paper_Question_Custom_Answer = await Module.User_ExamPaper_Question.create(
-        //           {
-        //               questionId: item.id,
-        //               examPaperId: req_body.paper.id,
-        //               score: item.score,
-        //               doRight: item.doRight,
-        //               doUser: req_body.user.username,
-        //               // doTime: req_body.user.doTime,
-        //           }
-        //         );
-        //     })();
-        //
-        // }
-        return 1;
     }
 }
 

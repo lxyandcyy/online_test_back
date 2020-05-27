@@ -15,6 +15,13 @@ class User_ExamPaper {
             records = await Module.User_ExamPaper.findAll({
                 where: { userId: userId },
             });
+
+            for (const item of records) {
+                let examPaper = await Module.ExamPaper.findOne({
+                    where: { id: item.examPaperId },
+                });
+                item.setDataValue("paperName", examPaper.name);
+            }
         }
         return records;
     }
@@ -55,13 +62,17 @@ class User_ExamPaper {
                 model: Module.Question,
             },
         });
+        let do_records = res;
+
         const data = res.get({ plain: true });
         /* 用户做题的记录 */
-        const records = data.Questions;
-        for (let i = 0; i < records.length; i++) {
-            const { OptionId, correct } = records[i].User_ExamPaper_Question;
+        const question_records = data.Questions;
+        for (let i = 0; i < question_records.length; i++) {
+            const { OptionId, correct } = question_records[
+                i
+            ].User_ExamPaper_Question;
             /* 通过题目的id查找对应的index，添加到属性里去 */
-            const index = allQuestionMap[records[i].id];
+            const index = allQuestionMap[question_records[i].id];
             if (index !== undefined) {
                 allQuestions[index].status = {
                     OptionId,
@@ -77,7 +88,9 @@ class User_ExamPaper {
         examPaper.paperScore = paperScore;
         return {
             examPaper,
-            records: allQuestions,
+            question_records: allQuestions,
+            spendTime: do_records.get("spendTime"),
+            userScore: do_records.get("userScore"),
         };
     }
 
@@ -88,12 +101,15 @@ class User_ExamPaper {
      * @returns {Promise<Boolean>} 用户是否做了该试卷
      */
     static async isUserDidExamPaper(userId, examPaperId) {
-        return !!Module.User_ExamPaper.findOne({
+        const result = await Module.User_ExamPaper.findOne({
             where: {
                 userId,
                 examPaperId,
             },
         });
+
+        console.log(!!result);
+        return !!result;
     }
     /**
      * TODO：提交答题卡
@@ -115,7 +131,7 @@ class User_ExamPaper {
      * @returns { Promise<QuestionRecord> }
      */
     static async submitExamPaper(data) {
-        if (this.isUserDidExamPaper(data.userId, data.examPaperId)) {
+        if (await this.isUserDidExamPaper(data.userId, data.examPaperId)) {
             throw new Error("用户已经做过该试题");
         }
         /* 每道题的选项映射，通过此数据结构能够更快查询到某题目的选项 */

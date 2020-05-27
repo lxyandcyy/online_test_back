@@ -8,7 +8,6 @@ let question = require("./app/routes/question");
 let examPaper = require("./app/routes/examPaper");
 let subject = require("./app/routes/subject");
 let verifyToken = require("./app/routes/verifyToken");
-let practicePaper = require("./app/routes/practicePaper");
 let statistic = require("./app/routes/statistic");
 let records = require("./app/routes/records");
 
@@ -40,7 +39,6 @@ app.use("/question", question);
 app.use("/exam-paper", examPaper);
 app.use("/subject", subject);
 app.use("/verify-token", verifyToken);
-app.use("/practice-paper", practicePaper);
 app.use("/statistic", statistic);
 app.use("/records", records);
 

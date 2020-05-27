@@ -2,8 +2,6 @@ var express = require("express");
 let router = express.Router();
 var Module = require("../models/Models");
 var Service = require("../service/Service");
-let axios = require("axios");
-let qs = require("qs");
 const { updateByPkInRoute } = require("../util/CRUDUtil");
 
 /*
@@ -74,8 +72,8 @@ router.post("/submit", async function (req, res) {
         console.log(err);
         return res.json({
             code: 400,
-            msg: "发生了错误",
-            err: err.message,
+            msg: err.message,
+            err: "发生了错误",
         });
     }
 });

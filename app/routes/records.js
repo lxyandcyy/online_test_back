@@ -24,18 +24,15 @@ router.get("/:id", async function (req, res) {
 路径：/records?userId&examPaperId  查询答题卡
 */
 router.get("/", async function (req, res) {
-    Service.User_ExamPaper.findRecord(req.query)
-        .then((records) => {
-            res.json({
-                code: 200,
-                msg: "获取所有考试记录成功！",
-                data: records,
-            });
-        })
-        .catch((err) => {
-            console.log(err);
-            res.json({ code: 500, msg: "未知错误", data: err.message });
-        });
+    let records = await Service.User_ExamPaper.findRecord({
+        examPaperId: parseInt(req.query.examPaperId),
+        userId: parseInt(req.query.userId),
+    });
+    res.json({
+        code: 200,
+        msg: "答题卡获取成功",
+        data: records,
+    });
 });
 
 module.exports = router;
