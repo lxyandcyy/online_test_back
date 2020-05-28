@@ -11,17 +11,25 @@ class User_ExamPaper {
         let records = null;
         if (userId == "undefined") {
             records = await Module.User_ExamPaper.findAll();
+            // 查找用户名
+            for (const item of records) {
+                let user = await Module.User.findOne({
+                    where: { id: item.userId },
+                });
+                item.setDataValue("userName", user.userId);
+            }
         } else {
             records = await Module.User_ExamPaper.findAll({
                 where: { userId: userId },
             });
+        }
 
-            for (const item of records) {
-                let examPaper = await Module.ExamPaper.findOne({
-                    where: { id: item.examPaperId },
-                });
-                item.setDataValue("paperName", examPaper.name);
-            }
+        // 查找试卷名称
+        for (const item of records) {
+            let examPaper = await Module.ExamPaper.findOne({
+                where: { id: item.examPaperId },
+            });
+            item.setDataValue("paperName", examPaper.name);
         }
         return records;
     }
