@@ -64,14 +64,92 @@ router.get("/histogram/:examPaperId", async function (req, res) {
     let rank = [
         // {userId:'lxy',userScore:0}
     ]; //排名情况
+    let paperScore = 0; //总分
+
+    /* 计算该试卷总分*/
+    // 找出该试卷的所有试题
+    const currentExamPaper = await Module.ExamPaper_Question.findAll({
+        where: { examPaperId: req.params.examPaperId },
+    });
+    // 各题目分数相加
+    for (item of currentExamPaper) {
+        paperScore = paperScore + item.get("score");
+    }
+
+    const user_examPaper = await Module.User_ExamPaper.findAll({
+        where: { examPaperId: req.params.examPaperId },
+    });
+    for (item of user_examPaper) {
+        let user = await Module.User.findOne({
+            where: { id: item.userId },
+        });
+        rank.push({
+            name: user.get("userId"),
+            userScore: item.userScore,
+        });
+    }
 
     res.json({
         code: 200,
         msg: "用户排名统计成功",
-        data: rank,
+        data: { rank, paperScore },
     });
 });
 
-router.get("/bar/:examPaperId", async function (req, res) {});
+router.get("/bar/:examPaperId", async function (req, res) {
+    console.log(req.params);
+    let paperScore = 0; //总分
+    let personCount = 0; //考试人数
+    let allPersonScore = 0; //所有用户总分，为计算平均分而用
+    let [lowScore, averageScore, highScore] = [10000, 0, 0]; //["最低分", "平均分", "最高分"]
+
+    /* 计算该试卷总分*/
+    // 找出该试卷的所有试题
+    const currentExamPaper = await Module.ExamPaper_Question.findAll({
+        where: { examPaperId: req.params.examPaperId },
+    });
+    // 各题目分数相加
+    for (item of currentExamPaper) {
+        paperScore = paperScore + item.get("score");
+    }
+
+    /* 计算最高分、最低分 */
+    const user_examPaper = await Module.User_ExamPaper.findAll({
+        where: { examPaperId: req.params.examPaperId },
+    });
+    for (item of user_examPaper) {
+        personCount++;
+        allPersonScore = allPersonScore + item.userScore;
+        if (lowScore > item.userScore) {
+            lowScore = item.userScore; //设置最低分
+        }
+        if (highScore < item.userScore) {
+            highScore = item.userScore; //设置最高分
+        }
+    }
+
+    /* 计算平均分 */
+    averageScore = allPersonScore / personCount;
+
+    if (personCount === 0) {
+        res.json({
+            code: 400,
+            msg: "还没有人做过该试卷，未生成试卷分析报告",
+            data: null,
+        });
+    } else {
+        res.json({
+            code: 200,
+            msg: "试卷平均分等分数统计成功",
+            data: {
+                lowScore,
+                averageScore,
+                highScore,
+                paperScore,
+                personCount,
+            },
+        });
+    }
+});
 
 module.exports = router;
