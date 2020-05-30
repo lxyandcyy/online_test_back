@@ -1,24 +1,30 @@
 var express = require("express");
 let router = express.Router();
-var Service = require("../service/Service");
 var Module = require("../models/Models");
+let sequelize = require("../config/DBconfig");
+const { Sequelize } = require("sequelize");
+let TimeConverse = require("../util/timeConverse");
 
 /**
  * 获取数量（用户、试卷、题目）
  */
 router.get("/countData", async function (req, res) {
-    const { ExamPaper, User, Question } = Module;
-    const promisesCount = [ExamPaper, User, Question].map((item) => {
+    const { ExamPaper, User, Question, Subject } = Module;
+    const promisesCount = [ExamPaper, User, Question, Subject].map((item) => {
         return item.count();
     });
-    const [examPaperCount, userCount, questionCount] = await Promise.all(
-        promisesCount
-    );
+    const [
+        examPaperCount,
+        userCount,
+        questionCount,
+        subjectCount,
+    ] = await Promise.all(promisesCount);
 
     res.json({
         examPaperCount,
         userCount,
         questionCount,
+        subjectCount,
     });
 });
 
@@ -152,4 +158,50 @@ router.get("/bar/:examPaperId", async function (req, res) {
     }
 });
 
+// 统计用户测试活跃度
+router.get("/activity", async function (req, res) {
+    let data = [
+        // {doNum:3,doTime:'2000-04-05'}
+    ];
+
+    if (req.query.userId === undefined) {
+        //查询全部考试记录
+
+        sequelize
+            .query(
+                `SELECT count(*) as count, year(do_time) as year, month(do_time) as month, day(do_time) as day \n
+                FROM online_test.user__exam_paper\n
+                group by year(do_time), month(do_time), day(do_time)\n
+                order by year(do_time) , month(do_time) , day(do_time) \n
+                limit 10;`
+            )
+            .then(([result, metadata]) => {
+                data = result;
+                res.json({
+                    code: 200,
+                    msg: "所有用户测试活跃度统计成功",
+                    data,
+                });
+            });
+    } else {
+        //查询指定userId考试记录
+        sequelize
+            .query(
+                `SELECT count(*) as count, year(do_time) as year, month(do_time) as month, day(do_time) as day \n
+                FROM online_test.user__exam_paper\n
+                where user_id = ${parseInt(req.query.userId)}\n
+                group by year(do_time), month(do_time), day(do_time)\n
+                order by year(do_time) desc, month(do_time) desc, day(do_time) desc\n
+                limit 10;`
+            )
+            .then(([result, metadata]) => {
+                data = result;
+                res.json({
+                    code: 200,
+                    msg: "个人测试活跃度统计成功",
+                    data,
+                });
+            });
+    }
+});
 module.exports = router;
