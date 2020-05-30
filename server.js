@@ -11,6 +11,11 @@ let verifyToken = require("./app/routes/verifyToken");
 let statistic = require("./app/routes/statistic");
 let records = require("./app/routes/records");
 
+
+var fs = require('fs');
+var http = require('http');
+var https = require('https');
+
 let cors = require("cors");
 
 // 解决cors跨域问题
@@ -42,9 +47,7 @@ app.use("/verify-token", verifyToken);
 app.use("/statistic", statistic);
 app.use("/records", records);
 
-let server = app.listen(ServerConfig.port, function () {
-    console.log("服务器打开了--> http://localhost:6001/");
-});
+
 app.get("/hello", (req, res, next) => {
     console.log(req.body);
     console.log(req.query);
@@ -55,4 +58,20 @@ app.use((req, res, next) => {
     console.log(res);
     next();
 });
-server.setTimeout(0);
+
+
+
+/** Https 配置 */
+var privateKey  = fs.readFileSync('sslcert/www.mona2544.top.key', 'utf8');
+var certificate = fs.readFileSync('sslcert/www.mona2544.top.pem', 'utf8');
+
+var credentials = {key: privateKey, cert: certificate};
+
+
+
+
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(ServerConfig.httpPort);
+httpsServer.listen(ServerConfig.httpsPort);

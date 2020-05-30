@@ -1,3 +1,4 @@
 module.exports = {
-    port: 6001,
+    httpsPort: 6001,
+    httpPort: 6002
 };
